@@ -1,0 +1,27 @@
+{
+  "name": "restapi",
+  "version": "1.0.0",
+  "description": "REST API utilizando MongoDB",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon ./index",
+    "start": "concurrently \"npm run dev\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hsabillon7/restapi.git"
+  },
+  "author": "Héctor Sabillón",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hsabillon7/restapi/issues"
+  },
+  "homepage": "https://github.com/hsabillon7/restapi#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^1.19.4"
+  },
+  "devDependencies": {
+    "concurrently": "^5.0.0"
+  }
+}
