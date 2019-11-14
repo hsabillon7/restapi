@@ -4,8 +4,7 @@
   "description": "REST API utilizando MongoDB",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon ./index",
-    "start": "concurrently \"npm run dev\""
+    "start": "nodemon ./index.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +18,7 @@
   "homepage": "https://github.com/hsabillon7/restapi#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "mongoose": "^5.7.11",
     "nodemon": "^1.19.4"
   },
   "devDependencies": {
