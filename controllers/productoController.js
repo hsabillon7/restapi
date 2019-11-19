@@ -1,10 +1,16 @@
 const Producto = require("../models/Producto");
+const multer = require("multer");
+const shortid = require("shortid");
 
 // Agregar un producto
 exports.nuevoProducto = async (req, res, next) => {
   const producto = new Producto(req.body);
 
   try {
+    if (req.file.filename) {
+      producto.imagen = req.file.filename;
+    }
+
     await producto.save();
 
     res
@@ -14,5 +20,97 @@ exports.nuevoProducto = async (req, res, next) => {
     res
       .status(422)
       .send({ error: "Ha ocurrido un error al momento de insertar" });
+  }
+};
+
+// Configuración de multer para la subida de archivos
+const configuracionMulter = {
+  storage: (fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, __dirname + "../../uploads");
+    },
+    filename: (req, file, cb) => {
+      const extension = file.mimetype.split("/")[1];
+      cb(null, `${shortid.generate()}.${extension}`);
+    }
+  })),
+  fileFilter(req, file, cb) {
+    if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+      cb(null, true);
+    } else {
+      cb(new Error("Formato de imagen no válido"));
+    }
+  }
+};
+
+// Obtener la configuración de multer y el campo de subida
+const upload = multer(configuracionMulter).single("imagen");
+
+// Subir un archivo al servidor
+exports.subirArchivo = (req, res, next) => {
+  upload(req, res, function(error) {
+    if (error) {
+      res.status(422).send({ error });
+    }
+    return next();
+  });
+};
+
+// Mostrar todos los productos
+exports.mostrarProductos = async (req, res, next) => {
+  try {
+    const productos = await Producto.find({});
+
+    res.status(200).send(productos);
+  } catch (error) {
+    res.status(422).send({
+      error: "Ha ocurrido un error al momento de obtener los productos"
+    });
+  }
+};
+
+// Obtener un producto mediante su id
+exports.mostrarProducto = async (req, res, next) => {
+  try {
+    const producto = await Producto.findById(req.params.idProducto);
+
+    if (!producto) {
+      res.status(404).send({ error: "El producto no existe" });
+    }
+
+    res.status(200).send(producto);
+  } catch (error) {
+    res.status(422).send({
+      error: "Ha ocurrido un error al momento de consultar el producto"
+    });
+  }
+};
+
+// Actualiza un producto mediante su id
+exports.actualizarProducto = async (req, res, next) => {
+  try {
+    let nuevoProducto = req.body;
+
+    // Verificar si se envió un archivo nuevo
+    if (req.file) {
+      nuevoProducto.imagen = req.file.filename;
+    } else {
+      const productoAnterior = await Producto.findById(req.params.idProducto);
+      nuevoProducto.imagen = productoAnterior.imagen;
+    }
+
+    const producto = await Producto.findOneAndUpdate(
+      { _id: req.params.idProducto },
+      nuevoProducto,
+      { new: true }
+    );
+
+    res.status(200).send(producto);
+  } catch (error) {
+    res
+      .status(422)
+      .send({
+        error: "Ha ocurrido un error al momento de actualizar el producto"
+      });
   }
 };
