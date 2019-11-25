@@ -107,10 +107,25 @@ exports.actualizarProducto = async (req, res, next) => {
 
     res.status(200).send(producto);
   } catch (error) {
+    res.status(422).send({
+      error: "Ha ocurrido un error al momento de actualizar el producto"
+    });
+  }
+};
+
+// Eliminar un produto
+exports.eliminarProducto = async (req, res, next) => {
+  try {
+    await Producto.findByIdAndDelete({ _id: req.params.idProducto });
+
+    res
+      .status(200)
+      .send({ mensaje: "El producto ha sido eliminado correctamente" });
+  } catch (error) {
     res
       .status(422)
-      .send({
-        error: "Ha ocurrido un error al momento de actualizar el producto"
+      .status({
+        error: "Ha ocurrido un error al momento de eliminar el producto"
       });
   }
 };
